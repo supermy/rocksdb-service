@@ -288,7 +288,7 @@ public class AppConfiguration {
 																	.get(() -> {  //http://127.0.0.1:9008/api/mydb/hash/ab ab=key
 
 																		byte[] value=mydb.get(key.getBytes()); //元素个数
-																		mydb.
+
 
 
 																		ctx.render(gson.toJson(new CommonJson<Map>(true, "获取数据成功!", toData(key,value))));
