@@ -1,7 +1,5 @@
 package org.supermy.rocksdb;
 
-import com.google.gson.Gson;
-import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -22,7 +21,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Controller
 @RequestMapping("/rocksdb")
 public class RocksDbController {
-    //private static final org.slf4j.Logger log = LoggerFactory.getLogger(RocksDbController.class);
     private static final Logger log = LoggerFactory.getLogger(RocksDbController.class);
 
     @Autowired
@@ -32,9 +30,7 @@ public class RocksDbController {
     private final AtomicLong counter = new AtomicLong();
 
     @RequestMapping(method = RequestMethod.GET)
-    public
-    @ResponseBody
-    Greeting sayHello(@RequestParam(value = "name", required = false, defaultValue = "Stranger") String name) {
+    public @ResponseBody Greeting sayHello(@RequestParam(value = "name", required = false, defaultValue = "Stranger") String name) {
         return new Greeting(counter.incrementAndGet(), String.format(template, name));
     }
 
@@ -47,29 +43,26 @@ public class RocksDbController {
     @RequestMapping(value = "/set", method = RequestMethod.GET)
     public
     @ResponseBody
-    String set(@RequestParam(value = "key", required = false, defaultValue = "key1") String key, @RequestParam String value) {
+    CommonJson<HashMap> set(@RequestParam(value = "key", required = false, defaultValue = "key1") String key, @RequestParam String value) {
         log.debug("set...{}  = ...{}", key, value);
+        HashMap<String,String> obj = new HashMap<String, String>();
 
-
-//        byte[] key1;
-//        byte[] key2;
-// some initialization for key1 and key2
         try {
-            //byte[] value = db.get(key1);
-            Gson gson = new Gson();
-            String json = gson.toJson(value);
             if (value != null) {  // value == null if key1 does not exist in db.
-                db.put(key.getBytes(), json.getBytes());
-                db.
+                db.put(key.getBytes(), value.getBytes());
             }
-            // --db.remove(key1);
         } catch (RocksDBException e) {
-            // error handling
             e.printStackTrace();
+
+            obj.put("cause", e.getLocalizedMessage());
+            return new CommonJson<HashMap>( false, "设置数据失败!", obj);
+
         }
-        return "ok";
-        //return new Greeting(counter.incrementAndGet(), String.format(template, name));
+        obj.put(key, value);
+
+        return new CommonJson<HashMap>(true, "设置数据成功!", obj);
     }
+
 
     /**
      * 获取json 数据
@@ -78,65 +71,79 @@ public class RocksDbController {
      * @RequestBody
      */
     @RequestMapping(value = "/get", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String get(@RequestParam(value = "key", required = false, defaultValue = "key1") String key) {
+    public @ResponseBody
+    CommonJson<HashMap> get(@RequestParam(value = "key", required = false, defaultValue = "key1") String key) {
         log.debug("set......{}", key);
+        HashMap<String,String> obj = new HashMap<String, String>();
 
-
-        byte[] value = null;
-//        byte[] key1;
-//        byte[] key2;
-// some initialization for key1 and key2
+        String value = "数据不存在";
         try {
-            value = db.get(key.getBytes());
+            byte[] value1 = db.get(key.getBytes());
+            //db.put();
+            if (value1 != null){
+                value = new String(value1);
+            }
 //            if (value != null) {  // value == null if key1 does not exist in db.
 //                db.put(key.getBytes(), value);
 //            }
             // --db.remove(key1);
-            return new String(value);
         } catch (RocksDBException e) {
-            // error handling
             e.printStackTrace();
-        }
-        db.close();
-//
-//        //return new Greeting(counter.incrementAndGet(), String.format(template, name));
 
-        return value.toString();
+            obj.put("cause", e.getLocalizedMessage());
+            return new CommonJson<HashMap>( false, "获取数据失败!", obj);
+
+        }
+        obj.put(key, value);
+
+        return new CommonJson<HashMap>(true, "获取数据成功!", obj);
 
     }
 
-    @RequestMapping(value = "/gt", method = RequestMethod.GET)
-    public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-        return new Greeting(counter.incrementAndGet(),
-                String.format(template, name));
+    /**
+     * 删除数据
+     *
+     * @param value
+     * @RequestBody
+     */
+    @RequestMapping(value = "/del", method = RequestMethod.GET)
+    public @ResponseBody
+    CommonJson<HashMap> del(@RequestParam(value = "key", required = false, defaultValue = "key1") String key) {
+        HashMap<String,String> obj = new HashMap<String, String>();
+
+        log.debug("set......{}", key);
+        try {
+            db.singleDelete(key.getBytes());
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+
+            obj.put("cause", e.getLocalizedMessage());
+            return new CommonJson<HashMap>( false, "删除数据失败!", obj);
+
+        }
+        obj.put(key, "");
+
+        return new CommonJson<HashMap>(true, "删除数据成功!", obj);
+
+
     }
 
 
     /**
      * 服务器状态
+     *
      * @return
      */
     @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public @ResponseBody String status() throws RocksDBException {
+    public
+    @ResponseBody
+    String status() throws RocksDBException {
         log.debug("status......{}");
         String stats = db.getProperty("rocksdb.stats");
         System.out.println(stats);
         return stats;
     }
-//
-//    /**
-//     * 销毁数据库
-//     * @return
-//     */
-//    @RequestMapping(value = "/destroy", method = RequestMethod.GET)
-//    public @ResponseBody String destroy() throws RocksDBException {
-//        log.debug("destroy......{}");
-//        Options options = new Options();
-//        factory.destroy(new File("example"), options);
-//        return stats;
-//    }
+
 
 }
 

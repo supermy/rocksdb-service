@@ -14,12 +14,19 @@
     </parent>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/io.ratpack/ratpack-spring-boot -->
+        <dependency>
+            <groupId>io.ratpack</groupId>
+            <artifactId>ratpack-spring-boot</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni -->
         <dependency>
             <groupId>org.rocksdb</groupId>
             <artifactId>rocksdbjni</artifactId>
-            <!--<version>5.2.1</version>-->
-            <version>4.2.0</version>
+            <version>5.2.1</version>
+            <!--<version>4.2.0</version>-->
         </dependency>
         <!--<dependency>-->
         <!--<groupId>org.jsimpledb</groupId>-->
