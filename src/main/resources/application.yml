@@ -14,4 +14,4 @@ management:
   address: 127.0.0.1
 
 db:
-  file: /Users/moyong/project/env-myopensource/1-spring/12-spring/rocksdb-service/src/main/resources/data/
+  file: data/

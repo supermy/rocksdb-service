@@ -1,5 +1,35 @@
 2017-05-23
     todo  Hash 类型支持
+
+        
+    数据路径通过配置文件加载；
+    使用外部配置文件
+        java -jar rocksdb-service-0.1.0.jar --spring.config.location=location_of_your_config_file.properties
+    使用Profile区分环境
+        @Service
+        @Profile("dev")
+        class DevEmailService implements EmailService {
+        
+            public void send(String email) {
+                //Do Nothing
+            }
+        }
+        
+        @Service
+        @Profile("prod")
+        class ProdEmailService implements EmailService {
+        
+            public void send(String email) {
+                //Real Email Service Logic
+            }
+        }
+        
+        @Profile("dev")表明只有Spring定义的Profile为dev时才会实例化DevEmailService这个类。那么如何设置Profile呢？
+        在application.properties中加入：
+            spring.profiles.active=dev
+        通过命令行参数
+            java -jar app.jar --spring.profiles.active=dev
+        
     
 2017-05-22
     nginx+lua 实现集群与鉴权

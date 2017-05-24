@@ -54,6 +54,7 @@ public class AppConfiguration {
 	public RocksDB RocksDbConfig(){
 		String filename = env.getRequiredProperty("db.file");
 
+
 		log.debug("rocks db path:",filename);
 
 		RocksDB.loadLibrary();
