@@ -17,7 +17,9 @@ import ratpack.http.TypedData;
 import ratpack.spring.config.EnableRatpack;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 interface Service {
@@ -259,16 +261,52 @@ public class AppConfiguration {
 											body.map(typedData -> typedData.getText()).
 													then(json -> {
 														Map<String,Object> map=gson.fromJson(json,HashMap.class);
-														for (String key:map.keySet()) {
-															mydb.put(key.getBytes(),gson.toJson(map.get(key)).getBytes());
+//														for (String key:map.keySet()) {
+//															mydb.put(key.getBytes(),gson.toJson(map.get(key)).getBytes());
+//														}
+														// write batch test
+														try (final WriteOptions writeOpt = new WriteOptions()) {
+																try (final WriteBatch batch = new WriteBatch()) {
+																	for (String key:map.keySet()) {
+																		batch.put(key.getBytes(),gson.toJson(map.get(key)).getBytes());
+																	}
+																	mydb.write(writeOpt, batch);
+																}
 														}
 														ctx.render(gson.toJson(new CommonJson<String>(true, "设置数据成功!", json)));
-//														ctx.render("Received request to create a new user with JSON: " + json);
 													});
-											//ctx.render("Received request to create a new user with JSON: " + json);
 
 										})  //批量数据获取
-										.get(() ->  ctx.render("Received request to list all users"))
+										.get(() -> {
+
+
+											final List<byte[]> keys = new ArrayList<>();
+											try (final RocksIterator iterator = mydb.newIterator()) {
+												for (iterator.seekToLast(); iterator.isValid(); iterator.prev()) {
+													keys.add(iterator.key());
+												}
+											}
+
+											Map<byte[], byte[]> values = mydb.multiGet(keys);
+											assert (values.size() == keys.size());
+											Map obj = new HashMap();
+											for (byte[] value:values.keySet()) {
+												String v=new String(values.get(value));
+												if (v.startsWith("{") && v.endsWith("}")){
+													System.out.println(v);
+													obj.put(new String(value),gson.fromJson(new String(values.get(value)),Map.class));
+												} else
+												{
+													obj.put(new String(value),new String(values.get(value)));
+												}
+											}
+
+											for (final byte[] value1 : values.values()) {
+												assert (value1 != null);
+											}
+
+											ctx.render(gson.toJson(obj));
+										} )
 
 								))
 				);
