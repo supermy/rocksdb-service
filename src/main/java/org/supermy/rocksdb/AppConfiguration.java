@@ -234,35 +234,41 @@ public class AppConfiguration {
 											.get(() -> {  //http://127.0.0.1:9008/api/mydb/ab ab=key
 												byte[] value=mydb.get(key.getBytes());
 												//ctx.render(gson.toJson(toJson(true,"数据获取成功",toData(key,value))));
-												ctx.render(gson.toJson(new CommonJson<Map>(true, "获取数据成功!", toData(key,value))));
+												ctx.render(gson.toJson(new CommonJson<Map>(true, "获取数据成功!", toJsonData(key,value,gson))));
 											})
 											.put(() -> {  //http://127.0.0.1:9008/api/mydb/ab ab=key body =value
 												Promise<TypedData> body = ctx.getRequest().getBody();
 												body.map(typedData -> typedData.getText()).
 														then(json -> {
-//															Map map=gson.fromJson(json,HashMap.class);
+															//Map map=gson.fromJson(json,HashMap.class);
 															mydb.put(key.getBytes(),json.getBytes());
-															ctx.render(gson.toJson(new CommonJson<Map>(true, "设置数据成功!", toData(key, json.getBytes()))));
+															ctx.render(gson.toJson(new CommonJson<Map>(true, "设置数据成功!", toJsonData(key, json.getBytes(),gson))));
 														});
 											})
 											.delete(() ->{
-												mydb.singleDelete(key.getBytes());
-												ctx.render(gson.toJson(new CommonJson<Map>(true, "删除数据成功!", toData(key,  "".getBytes()))));
+												 mydb.singleDelete(key.getBytes());
+												ctx.render(gson.toJson(new CommonJson<Map>(true, "删除数据成功!", toJsonData(key,  "".getBytes(),gson))));
 											})
 									);
 								})
 						)
 						.all(ctx -> ctx
 								.byMethod(method -> method
-										.post(() -> {
+										.post(() -> {  //批量数据更新
 											Promise<TypedData> body = ctx.getRequest().getBody();
-
 											body.map(typedData -> typedData.getText()).
-													then(json -> ctx.render("Received request to create a new user with JSON: " + json));
-
+													then(json -> {
+														Map<String,Object> map=gson.fromJson(json,HashMap.class);
+														for (String key:map.keySet()) {
+															mydb.put(key.getBytes(),gson.toJson(map.get(key)).getBytes());
+														}
+														ctx.render(gson.toJson(new CommonJson<String>(true, "设置数据成功!", json)));
+//														ctx.render("Received request to create a new user with JSON: " + json);
+													});
 											//ctx.render("Received request to create a new user with JSON: " + json);
-										})
-										.get(() -> ctx.render("Received request to list all users"))  //http://127.0.0.1:9008/api/users
+
+										})  //批量数据获取
+										.get(() ->  ctx.render("Received request to list all users"))
 
 								))
 				);
@@ -270,93 +276,14 @@ public class AppConfiguration {
 
 	}
 
-
-	/**
-	 * key/value(Hash)
-	 *
-	 * @param mydb
-	 * @param gson
-	 * @return
-	 */
-	@Bean
-	public Action<Chain> apimydbhash(RocksDB mydb,Gson gson) {
-		return chain -> chain
-				.prefix("api/hash", pchain -> pchain
-								.prefix(":key", uchain -> uchain
-												.all(ctx -> {
-													String key = ctx.getPathTokens().get("key");
-													ctx.byMethod(method -> method
-																	.get(() -> {  //http://127.0.0.1:9008/api/mydb/hash/ab ab=key
-
-																		byte[] value=mydb.get(key.getBytes()); //元素个数
-
-
-
-																		ctx.render(gson.toJson(new CommonJson<Map>(true, "获取数据成功!", toData(key,value))));
-																	})
-																	.put(() -> {  //http://127.0.0.1:9008/api/mydb/ab ab=key body {"ab"="123"}  key_filed = value 方式存储
-																		Promise<TypedData> body = ctx.getRequest().getBody();
-																		body.map(typedData -> typedData.getText()).
-																				then(json -> {
-																					Map<String,String> map=gson.fromJson(json,HashMap.class);
-																					for (String k:map.keySet()) {
-																						mydb.put((key+"_"+k).getBytes(),map.get(k).getBytes());
-																					}
-																					mydb.put(key.getBytes(),(map.keySet().size()+"").getBytes()); //元素个数
-
-																					ctx.render(gson.toJson(new CommonJson<Map>(true, "设置数据成功!", toData(key, json.getBytes()))));
-																				});
-																	})
-																	.delete(() ->{
-																		mydb.singleDelete(key.getBytes());
-																		ctx.render(gson.toJson(new CommonJson<Map>(true, "删除数据成功!", toData(key,  "".getBytes()))));
-																	})
-													);
-												})
-								)
-								.all(ctx -> ctx
-										.byMethod(method -> method
-												.post(() -> {
-													Promise<TypedData> body = ctx.getRequest().getBody();
-
-													body.map(typedData -> typedData.getText()).
-															then(json -> ctx.render("Received request to create a new user with JSON: " + json));
-
-													//ctx.render("Received request to create a new user with JSON: " + json);
-												})
-												.get(() -> ctx.render("Received request to list all users"))  //http://127.0.0.1:9008/api/users
-
-										))
-				);
-
-
-	}
-
-	public Map toJson(Boolean status, String msg,Object data) {
-		Map jo=new HashMap();
-		jo.put("status",status);
-		jo.put("msg",msg);
-		jo.put("data",data);
-		return jo;
-	}
-
-	/**
-	 * 转换 byte
-	 * @param key
-	 * @param value
-     * @return
-     */
-	public Map toData(String key, byte[] value) {
-		Map data1=new HashMap();
-		byte[] obj=value==null?"".getBytes():value;
-		data1.put(key,new String(obj));
-		return data1;
-	}
-
 	public Map toJsonData(String key, byte[] value,Gson gson) {
 		Map data1=new HashMap();
 		byte[] obj=value==null?"".getBytes():value;
-		data1.put(key,gson.fromJson(new String(obj),String.class));
+		log.debug("{}",obj);
+
+		System.out.println(new String(obj));
+
+		data1.put(key,gson.fromJson(new String(obj),HashMap.class));
 		return data1;
 	}
 

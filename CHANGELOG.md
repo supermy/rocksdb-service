@@ -1,3 +1,20 @@
+2017-05-24
+    采用简单策略；json 数据类型支持，默认为 json 数据格式；
+    通过 json 数据类型支持 Hash 类型；
+    一个实例一个数据表；
+    
+    restful 支持 json
+    http://127.0.0.1:9008/api/mydb/abc
+    
+    get http://127.0.0.1:9008/api/mydb/a
+    put http://127.0.0.1:9008/api/mydb/abc {"a"=12,"b"=c}
+    del http://127.0.0.1:9008/api/mydb/abc
+    
+    get http://127.0.0.1:9008/api/mydb/
+    post    http://127.0.0.1:9008/api/mydb/  {a:{"a":1},b:{b:1}}
+    
+    
+
 2017-05-23
     todo  Hash 类型支持
 
