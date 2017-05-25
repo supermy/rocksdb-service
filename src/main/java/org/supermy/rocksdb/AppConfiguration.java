@@ -15,6 +15,7 @@ import ratpack.func.Action;
 import ratpack.handling.Chain;
 import ratpack.http.TypedData;
 import ratpack.spring.config.EnableRatpack;
+import ratpack.util.MultiValueMap;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -248,7 +249,7 @@ public class AppConfiguration {
 														});
 											})
 											.delete(() ->{
-												 mydb.singleDelete(key.getBytes());
+												 mydb.delete(key.getBytes());
 												ctx.render(gson.toJson(new CommonJson<Map>(true, "删除数据成功!", toJsonData(key,  "".getBytes(),gson))));
 											})
 									);
@@ -278,22 +279,25 @@ public class AppConfiguration {
 
 										})  //批量数据获取
 										.get(() -> {
-
+											MultiValueMap<String, String> queryParams = ctx.getRequest().getQueryParams();
+											List<String> pre = queryParams.getAll("pre");
+											String prefix=pre==null?"":pre.get(0);
 
 											final List<byte[]> keys = new ArrayList<>();
 											try (final RocksIterator iterator = mydb.newIterator()) {
-												for (iterator.seekToLast(); iterator.isValid(); iterator.prev()) {
+												//iterator.seek("a".getBytes());  iterator.seekToLast()
+												for (iterator.seek(prefix.getBytes()); iterator.isValid()&&new String(iterator.key()).startsWith(prefix); iterator.next()) {
 													keys.add(iterator.key());
 												}
 											}
 
 											Map<byte[], byte[]> values = mydb.multiGet(keys);
-											assert (values.size() == keys.size());
+											//assert (values.size() == keys.size());
 											Map obj = new HashMap();
 											for (byte[] value:values.keySet()) {
 												String v=new String(values.get(value));
 												if (v.startsWith("{") && v.endsWith("}")){
-													System.out.println(v);
+													log.debug(v);
 													obj.put(new String(value),gson.fromJson(new String(values.get(value)),Map.class));
 												} else
 												{
@@ -301,11 +305,13 @@ public class AppConfiguration {
 												}
 											}
 
-											for (final byte[] value1 : values.values()) {
-												assert (value1 != null);
-											}
+//											for (final byte[] value1 : values.values()) {
+//												assert (value1 != null);
+//											}
 
-											ctx.render(gson.toJson(obj));
+//											mydb.getSnapshot();
+											ctx.render(gson.toJson(new CommonJson<Map>(true, "获取数据成功,前缀："+pre, obj)));
+//											ctx.render(gson.toJson(obj));
 										} )
 
 								))
@@ -319,7 +325,7 @@ public class AppConfiguration {
 		byte[] obj=value==null?"".getBytes():value;
 		log.debug("{}",obj);
 
-		System.out.println(new String(obj));
+		log.debug(new String(obj));
 
 		data1.put(key,gson.fromJson(new String(obj),HashMap.class));
 		return data1;

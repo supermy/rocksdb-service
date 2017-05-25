@@ -10,7 +10,7 @@
     put http://127.0.0.1:9008/api/mydb/abc {"a"=12,"b"=c}
     del http://127.0.0.1:9008/api/mydb/abc
     
-    get http://127.0.0.1:9008/api/mydb/
+    get http://127.0.0.1:9008/api/mydb?pre=ab  根据前缀查询 key
     post    http://127.0.0.1:9008/api/mydb/  {a:{"a":1},b:{b:1}}
     
     
