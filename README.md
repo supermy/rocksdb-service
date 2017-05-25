@@ -4,7 +4,7 @@ mydb是一个可持久化的大容量硬盘版的redis存储服务，兼容strin
 
 ## mydb用户
 
-<img src=""> <img src="" height = "100" width = "120" alt=""> 
+<img src="" height = "100" width = "120" alt=""> 
 
 
 
@@ -100,6 +100,7 @@ sh start.sh
 ```
    <img src="mydb-test.png" height = "400" width = "480" alt="1">
 ```
+    <img src="mydb-test.png" height = "400" width = "600" alt=""> 
 
 
 
