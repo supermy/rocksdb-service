@@ -97,10 +97,9 @@ sh start.sh
 ```
 
 ### 测试结果：
-```
-   <img src="mydb-test.png" height = "400" width = "480" alt="1">
-```
-    <img src="mydb-test.png" height = "400" width = "600" alt=""> 
+<img src="https://github.com/supermy/rocksdb-service/blob/master/mydb-test.png" height = "400" width = "480" alt="1">
+    
+
 
 
 
