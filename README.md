@@ -30,7 +30,7 @@ sh start.sh
 
 ## 编译安装
 
-1.下载安装 jdk8,下载源文件；：
+1.下载安装 jdk8,下载源文件
 
 ```
     git clone https://github.com/supermy/rocksdb-service
