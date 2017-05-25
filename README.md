@@ -4,9 +4,7 @@ mydb是一个可持久化的大容量硬盘版的redis存储服务，兼容strin
 
 ## mydb用户
 
-<img src=""> <img src="" height = "100" width = "120" alt=""> <img src="" height = "100" width = "120" alt="Garena"> <img src="" height = "100" width = "120" alt=""> 
-<img src=""> <img src="" height = "100" width = "120" alt=""> <img src="" height = "100" width = "120" alt="Garena"> <img src="" height = "100" width = "120" alt=""> 
-
+<img src=""> <img src="" height = "100" width = "120" alt=""> 
 
 
 
@@ -57,9 +55,6 @@ sh start.sh
 
 
 ## 使用
-```
-	./nohup java -Xmx1024m -Xss1024m -jar ../target/rocksdb-service-0.1.0.jar \
-              --spring.config.location=../src/main/resources/application.yml > mydb.log 2>&1 &
 
 ```
     若启动失败，通过修改 application.yam，重新设置启动端口，已经数据库的保存路径
@@ -86,11 +81,10 @@ sh start.sh
 
 ### 测试环境：
 ```
-	相同配置服务端、客户机各一台：
-	处理器：24核 Intel(R) Xeon(R) CPU E5-2630 v2 @ 2.60GHz
-	内存：165157944 kB
-	操作系统：CentOS release 6.2 (Final)
-	网卡：Intel Corporation I350 Gigabit Network Connection
+	相同配置服务端、客户机虚机各一台：
+	处理器：4核 
+	内存：4G
+	操作系统：Debian 8.7
 ```
 ### 测试接口：
 ```
