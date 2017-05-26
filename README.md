@@ -62,19 +62,50 @@ sh start.sh
 
     restful 支持 json
     
-    单个数据处理
+    单数据处理
     
     put:curl -XPUT "http://172.16.16.79:9008/api/mydb/abc" -d '{"a"=12,"b"=c}'
     get:curl http://172.16.16.79:9008/api/mydb/abc
-    del:curl -XDELETE "http://172.16.16.79:9008/api/mydb/abc"
+    del:curl -XDELETE "http://172.16.16.79:9008/api/mydb/abc" 
     
-    批量数据处理
+    批量数据处理，采用 Json 格式，采用 Flume 批量数据生产与消费。
+    约定格式'{a:{"a":1},b:{b:1}}'，a,b 为主键，{"a":1}、{b:1}为数据，类似于 Avro(可为 json 非压缩格式，可为二进制压缩格式) ;
     
     post: curl -XPOST "http://172.16.16.79:9008/api/mydb" -d  '{a:{"a":1},b:{b:1}}'
-    get:  curl "http://172.16.16.79:9008/api/mydb?pre=a"  根据前缀查询 key
+    delete:  curl "http://172.16.16.79:9008/api/mydb?pre=a"  根据前缀key批量删除数据
+    get:  curl "http://172.16.16.79:9008/api/mydb?pre=a"  根据前缀key查询数据
+    
+    
+    数据的备份与恢复
+    
+    查看数据状态：
+        http://127.0.0.1:9000/rocksdb/status
+    构造数据：
+        http://127.0.0.1:9000/rocksdb/gendata
+    备份数据：
+        http://127.0.0.1:9000/rocksdb/backdb
+    删除指定备份数据
+        http://127.0.0.1:9000/rocksdb/delbackdb?backid=11
+    清理备份数据，保留几分数据
+        http://127.0.0.1:9000/rocksdb/purebackdb?amount=2
+    恢复最新备份数据
+        http://127.0.0.1:9000/rocksdb/restorbackdb
+    恢复指定备份数据
+        http://127.0.0.1:9000/rocksdb/restorbackdbid?backid=14
 
 ```
-
+    
+    
+##  其他相关
+    
+```
+    可以采用F6(Nginx+lua) 进行鉴权
+    
+    可以采用 F6(Nginx+lua) 对数据进行编码与解码
+    
+    可以采用 F6(Nginx+lua) 对数据进行压缩与解压
+    
+```
 
 
 
@@ -102,7 +133,40 @@ sh start.sh
     
 
 
+## 优势：
 
+1.容量大：mydb没有Redis的内存限制, 最大使用空间等于磁盘空间的大小
+2.加载db速度快：mydb 在写入的时候, 数据是落盘的, 所以即使节点挂了, 不需要rdb或者oplog，mydb 重启不用加载所有数据到内存就能恢复之前的数据, 不需要进行回放数据操作。
+3.备份速度快：mydb备份的速度大致等同于cp的速度（拷贝数据文件后还有一个快照的恢复过程，会花费一些时间），这样在对于百G大库的备份是快捷的，更快的备份速度更好的解决了主从的全同步问题
+4.高压缩比：mydb 存储的数据默认会被压缩，相对于 Redis，mydb 有 5~10 倍的压缩比。所以 Redis 的数据存储到 mydb，数据体积会小很多。
+5.高性价比：相对于 Redis 使用昂贵的内存成本，mydb 使用磁盘存储数据，性价比极高
+
+## 劣势：
+
+由于mydb是基于内存和文件来存放数据, 所以性能肯定比Redis低一些, 但是我们一般使用SSD盘来存放数据, 尽可能跟上Redis的性能。
+
+## 适用场景
+
+从以上的对比可以看出, 如果你的业务场景的数据比较大，Redis 很难支撑， 比如大于50G，或者你的数据很重要，不允许断电丢失，那么使用mydb 就可以解决你的问题。 而在实际使用中，mydb的性能大约是Redis的50%。
+
+
+## 快照式备份方案
+
+不同于Redis，mydb的数据主要存储在磁盘中，这就使得其在做数据备份时有天然的优势，可以直接通过文件拷贝实现
+
+## mydb 是否会取代 Redis？为什么？
+
+mydb 并不会取代 Redis，mydb 是作为 Redis 的一个补充，从上面的对比可以看出 mydb 的主要应用场景在于：
+
+1. 业务量并没有那么大，使用 Redis 内存成本太高
+
+2. 数据量很大，使用 Redis 单个服务器内存无法承载
+
+3. 经常出现时间复杂度很高的请求让 Redis 间歇性阻塞
+
+因此对于对性能要求非常高，但是数据量非常小的场景，推荐业务使用 Redis。
+
+同一项目或者产品mydb，Redis，Redis-cluster 均在线上使用的情况。
 
 ## 文档
 1. [Wiki] (https://)
