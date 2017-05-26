@@ -62,18 +62,20 @@ sh start.sh
 
     restful 支持 json
     
+    172.16.16.79
+    
     单数据处理
     
-    put:curl -XPUT "http://172.16.16.79:9008/api/mydb/abc" -d '{"a"=12,"b"=c}'
-    get:curl http://172.16.16.79:9008/api/mydb/abc
-    del:curl -XDELETE "http://172.16.16.79:9008/api/mydb/abc" 
+    put:curl -XPUT "http://127.0.0.1:9008/api/mydb/abc" -d '{"a"=12,"b"=c}'
+    get:curl http://127.0.0.1:9008/api/mydb/abc
+    del:curl -XDELETE "http://127.0.0.1:9008/api/mydb/abc" 
     
     批量数据处理，采用 Json 格式，采用 Flume 批量数据生产与消费。
-    约定格式'{a:{"a":1},b:{b:1}}'，a,b 为主键，{"a":1}、{b:1}为数据，类似于 Avro(可为 json 非压缩格式，可为二进制压缩格式) ;
+    约定格式'{a:{"a":1},b:{b:1}}'，a,b 为主键，{"a":1}、{b:1}为数据 ;
     
-    post: curl -XPOST "http://172.16.16.79:9008/api/mydb" -d  '{a:{"a":1},b:{b:1}}'
-    delete:  curl "http://172.16.16.79:9008/api/mydb?pre=a"  根据前缀key批量删除数据
-    get:  curl "http://172.16.16.79:9008/api/mydb?pre=a"  根据前缀key查询数据
+    post: curl -XPOST "http://127.0.0.1:9008/api/mydb" -d  '{a:{"a":1},b:{b:1}}'
+    delete:  curl "http://127.0.0.1:9008/api/mydb?pre=a"  根据前缀key批量删除数据
+    get:  curl "http://127.0.0.1:9008/api/mydb?pre=a"  根据前缀key查询数据
     
     
     数据的备份与恢复
@@ -125,7 +127,7 @@ sh start.sh
 
 ### 测试方法：
 ```
-	ab -c 200 -n 8000 "http://172.16.16.79:9008/api/mydb?pre=a" 
+	ab -c 200 -n 8000 "http://127.0.0.1:9008/api/mydb?pre=a" 
 ```
 
 ### 测试结果：
