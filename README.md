@@ -1,8 +1,11 @@
 # mydb
 
 ## 简介 
-mydb是一个可持久化的大容量硬盘版的redis存储服务，兼容string、json 数据格式的接口;
-解决redis由于存储数据量巨大而导致内存不够用的容量瓶颈，可以当做一个大容量的 HashMap 来用。
+* RocksDb Service提供key/Value的微服务，构建集群提升服务能力；在大数据领域对Cube进行了扩展，通过执行 MapReduce/Spark任务构建Cube，对业务所需的维度组合和度量进行预聚合，当查询到达时直接访问预计算聚合结果，省去对大数据的扫描和运算；把Cube结果存入 mydb;
+在数据集市层面取代 Redis、Hbase、Apache Kylin。
+
+* 单节点的mydb是一个可持久化的大容量硬盘版的redis存储服务，兼容string、json 数据格式的接口;解决redis由于存储数据量巨大而导致内存不够用的容量瓶颈，可以当做一个大容量的 HashMap 来用。
+
 
 ## 特点
 * 容量大，支持百G数据量的存储
