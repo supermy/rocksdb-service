@@ -1,5 +1,7 @@
 # mydb
 
+[![Build Status](https://travis-ci.org/supermy/rocksdb-service.svg?branch=master)](https://github.com/supermy/rocksdb-service)
+
 ## 简介 
 * RocksDb Service提供key/Value的微服务，构建集群提升服务能力；在大数据领域对Cube进行了扩展，通过执行 MapReduce/Spark任务构建Cube，对业务所需的维度组合和度量进行预聚合，当查询到达时直接访问预计算聚合结果，省去对大数据的扫描和运算；把Cube结果存入 mydb;
 在数据集市层面取代 Redis、Hbase、Apache Kylin。
