@@ -10,7 +10,7 @@ import java.io.Writer;
  * Created by moyong on 17/5/18.
  */
 public class GsonTest {
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RocksJavaTest.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(GsonTest.class);
 
     public static void main(String[] args) {
         People p = new People();
