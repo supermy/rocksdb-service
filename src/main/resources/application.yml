@@ -1,5 +1,6 @@
 ratpack:
   port: 9008
+  maxThreads: 1000  #默认 cpu 内核数量*2
 
 dropwizard:
   jmx: true
@@ -9,9 +10,17 @@ dropwizard:
 
 server:
   port: 9000
+#  tomcat:
+#    basedir: /tmp
+#    max-threads:  3000
+#    uri-encoding: UTF-8
+
 management:
   port: 9001
-  address: 127.0.0.1
+#  address: 127.0.0.1
 
 db:
   file: data/
+
+
+

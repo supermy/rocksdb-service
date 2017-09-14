@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import ratpack.exec.Promise;
 import ratpack.func.Action;
 import ratpack.handling.Chain;
@@ -30,8 +32,8 @@ interface Service {
 @SpringBootApplication
 @EnableConfigurationProperties
 //@EnableWebMvc
-@EnableRatpack
-public class AppConfiguration { //extends WebMvcConfigurerAdapter  {
+@EnableRatpack //Spring Boot 中把 Ratpack 作为 Servlet 容器的替代
+public class AppConfiguration { //extends WebMvcConfigurerAdapter {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 
     @Resource
