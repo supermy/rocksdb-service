@@ -73,10 +73,14 @@ public class AppConfiguration { //extends WebMvcConfigurerAdapter {
         RocksDB.loadLibrary();
         // the Options class contains a set of configurable DB options
         // that determines the behavior of a database.
-        Options options = new Options();
+        final Options options = new Options();
+
+        final Statistics stats = new Statistics();
+
+
         try {
             options.setCreateIfMissing(true)
-                    .createStatistics()
+                    .setStatistics(stats)
                     .setWriteBufferSize(8 * SizeUnit.KB)
                     .setMaxWriteBufferNumber(3)
                     .setMaxBackgroundCompactions(10)

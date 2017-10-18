@@ -1,12 +1,23 @@
 ###2017-10-18
+    准备支持 redis
+    
+```aidl
+    升级完成，测试 ok
+        spring-boot-starter-parent 1.5.8
+        Rocksdb 5.8.0
+        ratpack-spring-boot 1.5.0
 
-    spring 端口
+```
+
+###2017-10-18
+
+    spring 端口-通常用于管理平台
     http://127.0.0.1:9000/rocksdb/status
    
-    ratpack 端口
+    ratpack 端口-通常用于 api 或者数据
     http://127.0.0.1:9008/
    
-    管理端口
+    管理端口-配置管理
     http://127.0.0.1:9001/
     
 
