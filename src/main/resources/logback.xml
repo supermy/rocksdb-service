@@ -31,7 +31,6 @@
 	<logger name="org.springframework.data.rest.webmvc" level="DEBUG" />
 
 
-
 	<!--log4jdbc -->
 	<logger name="jdbc.sqltiming" level="DEBUG"/>
 

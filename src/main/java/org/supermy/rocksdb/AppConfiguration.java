@@ -31,7 +31,6 @@ interface Service {
 
 @SpringBootApplication
 @EnableConfigurationProperties
-//@EnableWebMvc
 @EnableRatpack //Spring Boot 中把 Ratpack 作为 Servlet 容器的替代
 public class AppConfiguration { //extends WebMvcConfigurerAdapter {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(AppConfiguration.class);
